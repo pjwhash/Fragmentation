@@ -1,13 +1,13 @@
 package me.yokeyword.fragmentation.queue;
 
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 
 /**
  * Created by YoKey on 17/12/28.
  */
 
 public abstract class Action {
-    public static final int BUFFER_TIME = 60;
+    public static final long DEFAULT_POP_TIME = 300L;
 
     public static final int ACTION_NORMAL = 0;
     public static final int ACTION_POP = 1;
@@ -24,9 +24,6 @@ public abstract class Action {
 
     public Action(int action) {
         this.action = action;
-        if (action == ACTION_POP_MOCK) {
-            duration = BUFFER_TIME;
-        }
     }
 
     public Action(int action, FragmentManager fragmentManager) {

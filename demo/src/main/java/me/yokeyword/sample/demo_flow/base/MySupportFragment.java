@@ -3,9 +3,9 @@ package me.yokeyword.sample.demo_flow.base;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.view.View;
 import android.view.animation.Animation;
 
@@ -319,6 +319,15 @@ public class MySupportFragment extends Fragment implements ISupportFragment {
      */
     public void startWithPop(ISupportFragment toFragment) {
         mDelegate.startWithPop(toFragment);
+    }
+
+    /**
+     * @see #popTo(Class, boolean)
+     * +
+     * @see #start(ISupportFragment)
+     */
+    public void startWithPopTo(ISupportFragment toFragment, Class<?> targetFragmentClass, boolean includeTargetFragment) {
+        mDelegate.startWithPopTo(toFragment, targetFragmentClass, includeTargetFragment);
     }
 
     public void replaceFragment(ISupportFragment toFragment, boolean addToBackStack) {

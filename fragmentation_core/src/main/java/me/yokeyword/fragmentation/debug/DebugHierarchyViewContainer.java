@@ -3,7 +3,7 @@ package me.yokeyword.fragmentation.debug;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -84,7 +84,7 @@ public class DebugHierarchyViewContainer extends ScrollView {
         mTitleLayout.setLayoutParams(flParams);
 
         TextView title = new TextView(mContext);
-        title.setText("栈视图(Stack)");
+        title.setText(R.string.fragmentation_stack_view);
         title.setTextSize(20);
         title.setTextColor(Color.BLACK);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -101,7 +101,7 @@ public class DebugHierarchyViewContainer extends ScrollView {
         mTitleLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "* means not in backBack.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.fragmentation_stack_help, Toast.LENGTH_LONG).show();
             }
         });
         mTitleLayout.addView(img);

@@ -1,15 +1,15 @@
 package me.yokeyword.fragmentation;
 
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentationMagician;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import android.view.MotionEvent;
 
+import androidx.fragment.app.FragmentationMagician;
 import me.yokeyword.fragmentation.anim.DefaultVerticalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
 import me.yokeyword.fragmentation.debug.DebugStackDelegate;
@@ -32,6 +32,7 @@ public class SupportActivityDelegate {
             throw new RuntimeException("Must extends FragmentActivity/AppCompatActivity");
         this.mSupport = support;
         this.mActivity = (FragmentActivity) support;
+        this.mDebugStackDelegate = new DebugStackDelegate(this.mActivity);
     }
 
     /**
@@ -44,8 +45,6 @@ public class SupportActivityDelegate {
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         mTransactionDelegate = getTransactionDelegate();
-        mDebugStackDelegate = new DebugStackDelegate(mActivity);
-
         mFragmentAnimator = mSupport.onCreateFragmentAnimator();
         mDebugStackDelegate.onCreate(Fragmentation.getDefault().getMode());
     }
@@ -133,9 +132,9 @@ public class SupportActivityDelegate {
 
     /**
      * Causes the Runnable r to be added to the action queue.
-     *
+     * <p>
      * The runnable will be run after all the previous action has been run.
-     *
+     * <p>
      * 前面的事务全部执行后 执行该Action
      */
     public void post(final Runnable runnable) {
@@ -248,6 +247,10 @@ public class SupportActivityDelegate {
      */
     public void startWithPop(ISupportFragment toFragment) {
         mTransactionDelegate.startWithPop(getSupportFragmentManager(), getTopFragment(), toFragment);
+    }
+
+    public void startWithPopTo(ISupportFragment toFragment, Class<?> targetFragmentClass, boolean includeTargetFragment) {
+        mTransactionDelegate.startWithPopTo(getSupportFragmentManager(), getTopFragment(), toFragment, targetFragmentClass.getName(), includeTargetFragment);
     }
 
     public void replaceFragment(ISupportFragment toFragment, boolean addToBackStack) {

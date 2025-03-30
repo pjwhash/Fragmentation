@@ -1,8 +1,8 @@
 package me.yokeyword.sample.demo_wechat.ui.fragment.second;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +50,15 @@ public class NewFeatureFragment extends BaseBackFragment {
                         .setCustomAnimations(R.anim.v_fragment_enter, R.anim.v_fragment_pop_exit,
                                 R.anim.v_fragment_pop_enter, R.anim.v_fragment_exit)
                         .start(CycleFragment.newInstance(0));
+            }
+        });
+
+        // 启动一个DialogFragment
+        view.findViewById(R.id.btn_dialog).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DemoDialogFragment dialogFragment = DemoDialogFragment.newInstance();
+                dialogFragment.show(getFragmentManager(), getClass().getSimpleName());
             }
         });
 

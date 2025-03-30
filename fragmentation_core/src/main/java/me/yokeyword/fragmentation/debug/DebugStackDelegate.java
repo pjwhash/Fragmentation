@@ -5,12 +5,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentationMagician;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -23,7 +22,9 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.fragment.app.FragmentationMagician;
 import me.yokeyword.fragmentation.Fragmentation;
+import me.yokeyword.fragmentation.ISupportFragment;
 import me.yokeyword.fragmentation.R;
 
 /**
@@ -196,7 +197,7 @@ public class DebugStackDelegate implements SensorEventListener {
             int backStackCount = fragment.getFragmentManager().getBackStackEntryCount();
             CharSequence name = fragment.getClass().getSimpleName();
             if (backStackCount == 0) {
-                name = span(name);
+                name = span(name, " *");
             } else {
                 for (int j = 0; j < backStackCount; j++) {
                     FragmentManager.BackStackEntry entry = fragment.getFragmentManager().getBackStackEntryAt(j);
@@ -205,17 +206,22 @@ public class DebugStackDelegate implements SensorEventListener {
                         break;
                     }
                     if (j == backStackCount - 1) {
-                        name = span(name);
+                        name = span(name, " *");
                     }
                 }
             }
+
+            if (fragment instanceof ISupportFragment && ((ISupportFragment)fragment).isSupportVisible()) {
+                name = span(name, " ☀");
+            }
+
             fragmentRecords.add(new DebugFragmentRecord(name, getChildFragmentRecords(fragment)));
         }
     }
 
     @NonNull
-    private CharSequence span(CharSequence name) {
-        name = name + " *";
+    private CharSequence span(CharSequence name, String str) {
+        name = name + str;
         return name;
     }
 

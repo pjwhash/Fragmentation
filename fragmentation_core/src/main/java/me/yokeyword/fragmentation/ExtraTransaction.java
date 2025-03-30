@@ -1,12 +1,12 @@
 package me.yokeyword.fragmentation;
 
 import android.os.Build;
-import android.support.annotation.AnimRes;
-import android.support.annotation.AnimatorRes;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import androidx.annotation.AnimRes;
+import androidx.annotation.AnimatorRes;
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -68,6 +68,8 @@ public abstract class ExtraTransaction {
 
     public abstract void startDontHideSelf(ISupportFragment toFragment);
 
+    public abstract void startDontHideSelf(ISupportFragment toFragment, @ISupportFragment.LaunchMode int launchMode);
+
     public abstract void start(ISupportFragment toFragment, @ISupportFragment.LaunchMode int launchMode);
 
     public abstract void startForResult(ISupportFragment toFragment, int requestCode);
@@ -75,6 +77,8 @@ public abstract class ExtraTransaction {
     public abstract void startForResultDontHideSelf(ISupportFragment toFragment, int requestCode);
 
     public abstract void startWithPop(ISupportFragment toFragment);
+
+    public abstract void startWithPopTo(ISupportFragment toFragment, String targetFragmentTag, boolean includeTargetFragment);
 
     public abstract void replace(ISupportFragment toFragment);
 
@@ -240,6 +244,12 @@ public abstract class ExtraTransaction {
         }
 
         @Override
+        public void startDontHideSelf(ISupportFragment toFragment, @ISupportFragment.LaunchMode int launchMode) {
+            toFragment.getSupportDelegate().mTransactionRecord = mRecord;
+            mTransactionDelegate.dispatchStartTransaction(getFragmentManager(), mSupportF, toFragment, 0, launchMode, TransactionDelegate.TYPE_ADD_WITHOUT_HIDE);
+        }
+
+        @Override
         public void start(ISupportFragment toFragment, @ISupportFragment.LaunchMode int launchMode) {
             toFragment.getSupportDelegate().mTransactionRecord = mRecord;
             mTransactionDelegate.dispatchStartTransaction(getFragmentManager(), mSupportF, toFragment, 0, launchMode, TransactionDelegate.TYPE_ADD);
@@ -261,6 +271,12 @@ public abstract class ExtraTransaction {
         public void startWithPop(ISupportFragment toFragment) {
             toFragment.getSupportDelegate().mTransactionRecord = mRecord;
             mTransactionDelegate.startWithPop(getFragmentManager(), mSupportF, toFragment);
+        }
+
+        @Override
+        public void startWithPopTo(ISupportFragment toFragment, String targetFragmentTag, boolean includeTargetFragment) {
+            toFragment.getSupportDelegate().mTransactionRecord = mRecord;
+            mTransactionDelegate.startWithPopTo(getFragmentManager(), mSupportF, toFragment, targetFragmentTag, includeTargetFragment);
         }
 
         @Override

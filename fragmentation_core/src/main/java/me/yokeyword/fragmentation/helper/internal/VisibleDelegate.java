@@ -3,13 +3,13 @@ package me.yokeyword.fragmentation.helper.internal;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentationMagician;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import java.util.List;
 
+import androidx.fragment.app.FragmentationMagician;
 import me.yokeyword.fragmentation.ISupportFragment;
 
 /**
@@ -25,8 +25,9 @@ public class VisibleDelegate {
     private boolean mNeedDispatch = true;
     private boolean mInvisibleWhenLeave;
     private boolean mIsFirstVisible = true;
-    private boolean mFixStatePagerAdapter;
     private boolean mFirstCreateViewCompatReplace = true;
+    private boolean mAbortInitVisible = false;
+    private Runnable taskDispatchSupportVisible;
 
     private Handler mHandler;
     private Bundle mSaveInstanceState;
@@ -42,10 +43,9 @@ public class VisibleDelegate {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mSaveInstanceState = savedInstanceState;
-            if (!mFixStatePagerAdapter) { // setUserVisibleHint() may be called before onCreate()
-                mInvisibleWhenLeave = savedInstanceState.getBoolean(FRAGMENTATION_STATE_SAVE_IS_INVISIBLE_WHEN_LEAVE);
-                mFirstCreateViewCompatReplace = savedInstanceState.getBoolean(FRAGMENTATION_STATE_SAVE_COMPAT_REPLACE);
-            }
+            // setUserVisibleHint() may be called before onCreate()
+            mInvisibleWhenLeave = savedInstanceState.getBoolean(FRAGMENTATION_STATE_SAVE_IS_INVISIBLE_WHEN_LEAVE);
+            mFirstCreateViewCompatReplace = savedInstanceState.getBoolean(FRAGMENTATION_STATE_SAVE_COMPAT_REPLACE);
         }
     }
 
@@ -63,8 +63,11 @@ public class VisibleDelegate {
             mFirstCreateViewCompatReplace = false;
         }
 
-        if (!mInvisibleWhenLeave && !mFragment.isHidden() &&
-                (mFragment.getUserVisibleHint() || mFixStatePagerAdapter)) {
+        initVisible();
+    }
+
+    private void initVisible() {
+        if (!mInvisibleWhenLeave && !mFragment.isHidden() && mFragment.getUserVisibleHint()) {
             if ((mFragment.getParentFragment() != null && isFragmentVisible(mFragment.getParentFragment()))
                     || mFragment.getParentFragment() == null) {
                 mNeedDispatch = false;
@@ -79,10 +82,21 @@ public class VisibleDelegate {
                 mNeedDispatch = false;
                 dispatchSupportVisible(true);
             }
+        } else {
+            if (mAbortInitVisible) {
+                mAbortInitVisible = false;
+                initVisible();
+            }
         }
     }
 
     public void onPause() {
+        if (taskDispatchSupportVisible != null) {
+            getHandler().removeCallbacks(taskDispatchSupportVisible);
+            mAbortInitVisible = true;
+            return;
+        }
+
         if (mIsSupportVisible && isFragmentVisible(mFragment)) {
             mNeedDispatch = false;
             mInvisibleWhenLeave = false;
@@ -95,7 +109,7 @@ public class VisibleDelegate {
     public void onHiddenChanged(boolean hidden) {
         if (!hidden && !mFragment.isResumed()) {
             //if fragment is shown but not resumed, ignore...
-            mInvisibleWhenLeave = false;
+            onFragmentShownWhenNotResumed();
             return;
         }
         if (hidden) {
@@ -105,21 +119,34 @@ public class VisibleDelegate {
         }
     }
 
+    private void onFragmentShownWhenNotResumed() {
+        mInvisibleWhenLeave = false;
+        dispatchChildOnFragmentShownWhenNotResumed();
+    }
+
+    private void dispatchChildOnFragmentShownWhenNotResumed() {
+        FragmentManager fragmentManager = mFragment.getChildFragmentManager();
+        List<Fragment> childFragments = FragmentationMagician.getActiveFragments(fragmentManager);
+        if (childFragments != null) {
+            for (Fragment child : childFragments) {
+                if (child instanceof ISupportFragment && !child.isHidden() && child.getUserVisibleHint()) {
+                    ((ISupportFragment) child).getSupportDelegate().getVisibleDelegate().onFragmentShownWhenNotResumed();
+                }
+            }
+        }
+    }
+
     public void onDestroyView() {
         mIsFirstVisible = true;
-        mFixStatePagerAdapter = false;
     }
 
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        if (mFragment.isResumed() || (mFragment.isDetached() && isVisibleToUser)) {
+        if (mFragment.isResumed() || (!mFragment.isAdded() && isVisibleToUser)) {
             if (!mIsSupportVisible && isVisibleToUser) {
                 safeDispatchUserVisibleHint(true);
             } else if (mIsSupportVisible && !isVisibleToUser) {
                 dispatchSupportVisible(false);
             }
-        } else if (isVisibleToUser) {
-            mInvisibleWhenLeave = false;
-            mFixStatePagerAdapter = true;
         }
     }
 
@@ -133,12 +160,14 @@ public class VisibleDelegate {
     }
 
     private void enqueueDispatchVisible() {
-        getHandler().post(new Runnable() {
+        taskDispatchSupportVisible = new Runnable() {
             @Override
             public void run() {
+                taskDispatchSupportVisible = null;
                 dispatchSupportVisible(true);
             }
-        });
+        };
+        getHandler().post(taskDispatchSupportVisible);
     }
 
     private void dispatchSupportVisible(boolean visible) {
@@ -184,8 +213,13 @@ public class VisibleDelegate {
     }
 
     private boolean isParentInvisible() {
-        ISupportFragment fragment = (ISupportFragment) mFragment.getParentFragment();
-        return fragment != null && !fragment.isSupportVisible();
+        Fragment parentFragment = mFragment.getParentFragment();
+
+        if (parentFragment instanceof ISupportFragment) {
+            return !((ISupportFragment) parentFragment).isSupportVisible();
+        }
+
+        return parentFragment != null && !parentFragment.isVisible();
     }
 
     private boolean checkAddState() {
