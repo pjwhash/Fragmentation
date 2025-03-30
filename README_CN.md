@@ -19,6 +19,9 @@ A powerful library that manage Fragment for Android!
 
 
 
+## Gradle 與 Java 版本
+Java 8需要Gradle 2.0或更高版本，Java 11需要Gradle 5.0或更高版本。
+
 ## For Arctic Fox
 ![](/gif/for-arctic-fox/images/QQ20250330-175441.png)
 ![](/gif/for-arctic-fox/images/QQ20250330-175509.png)
