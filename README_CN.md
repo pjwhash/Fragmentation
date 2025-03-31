@@ -3,6 +3,12 @@
 [![Download](https://api.bintray.com/packages/yokeyword/maven/Fragmentation/images/download.svg) ](https://bintray.com/yokeyword/maven/Fragmentation/_latestVersion)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
+
+# [英語版 README.md](README_CN.md)
+
+# [For Arctic Fox](README_FOR_ARCTIC_FOX.md)
+
+
 # Fragmentation
 A powerful library that manage Fragment for Android!
 
@@ -16,16 +22,6 @@ A powerful library that manage Fragment for Android!
 [Fragment全解析系列（一）：那些年踩过的坑](http://www.jianshu.com/p/d9143a92ad94)
 
 [Fragment全解析系列（二）：正确的使用姿势](http://www.jianshu.com/p/fd71d65f0ec6)
-
-
-
-## Gradle 與 Java 版本
-Java 8需要Gradle 2.0或更高版本，Java 11需要Gradle 5.0或更高版本。
-
-## For Arctic Fox
-![](/gif/for-arctic-fox/images/QQ20250330-175441.png)
-![](/gif/for-arctic-fox/images/QQ20250330-175509.png)
-
 
 
 

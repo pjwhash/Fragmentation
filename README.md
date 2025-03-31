@@ -7,6 +7,7 @@
 
 # [中文版 README.md](README_CN.md)
 
+# [For Arctic Fox](README_FOR_ARCTIC_FOX.md)
 
 # Fragmentation
 
@@ -15,16 +16,6 @@
 Fragmentation is a powerful library managing Fragment for Android.
 
 It is designed for "Single Activity + Multi-Fragments" and "Multi-FragmentActivities + Multi-Fragments" architecture to simplify development process.
-
-
-## Gradle 與 Java 版本
-Java 8需要Gradle 2.0或更高版本，Java 11需要Gradle 5.0或更高版本。
-
-
-## For Arctic Fox
-![](/gif/for-arctic-fox/images/QQ20250330-175441.png)
-![](/gif/for-arctic-fox/images/QQ20250330-175509.png)
-
 
 
 ## Demo
